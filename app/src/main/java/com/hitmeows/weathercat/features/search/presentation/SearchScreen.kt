@@ -1,9 +1,10 @@
 package com.hitmeows.weathercat.features.search.presentation
 
 import android.location.Location
-import android.location.LocationManager
-import android.location.LocationRequest
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
@@ -13,23 +14,35 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.hitmeows.weathercat.features.search.domain.SearchedCity
+import com.google.accompanist.permissions.shouldShowRationale
 
 @Composable
 fun SearchScreen(
+	getLocation: () -> Location?,
 	viewModel: SearchScreenViewModel = hiltViewModel()
 ) {
 	val state = viewModel.citiesState.value
 	
-	SearchBar(onSearch = {
-		viewModel.searchCity(it)
-	})
+	Column() {
+		SearchBar(onSearch = {
+			viewModel.searchCity(it)
+		})
+		CitiesColumn(citiesState = state,
+			onItemClick = {lat,lon->
+				viewModel.getWeather(lat, lon)
+			}
+		) {
+			getLocation()
+		}
+	}
 }
 
 @Composable
@@ -48,23 +61,28 @@ fun SearchBar(
 			imeAction = ImeAction.Search
 		),
 		keyboardActions = KeyboardActions(
-			onSearch = {onSearch(textToSearch)}
+			onSearch = { onSearch(textToSearch) }
 		)
-	//todo
-	//trailing and leading icons
+		//todo
+		//trailing and leading icons
 	)
 }
 
 @Composable
 fun CitiesColumn(
 	citiesState: SearchedCitiesState,
-	onItemClick: (Double,Double) -> Unit
+	onItemClick: (Double, Double) -> Unit,
+	getLocation: () -> Location?
 ) {
 	if (citiesState.isLoading) CircularProgressIndicator()
 	if (citiesState.isError) Text(text = citiesState.errorMessage)
 	LazyColumn() {
 		item {
-		
+			CurrentCity(onClick = {lat,lon ->
+				onItemClick(lat,lon)
+			}) {
+				getLocation()
+			}
 		}
 		
 		items(citiesState.citiesList) {
@@ -72,9 +90,9 @@ fun CitiesColumn(
 				text = it.cityName +
 						if (it.stateName.isNotBlank()) ", ${it.stateName}"
 						else "" +
-						", ${it.countryName}"
+								", ${it.countryName}"
 			) {
-				onItemClick(it.lat,it.lon)
+				onItemClick(it.lat, it.lon)
 			}
 		}
 	}
@@ -93,15 +111,39 @@ fun CityItem(
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CurrentCity(
-	onClick: (Double,Double,Boolean) -> Unit
+	onClick: (Double, Double) -> Unit,
+	getLocation: () -> Location?
 ) {
-	val locationPermissionState = rememberPermissionState(
-		permission = android.Manifest.permission.ACCESS_COARSE_LOCATION)
+	val locationPermissionsState = rememberPermissionState(
+		permission = android.Manifest.permission.ACCESS_COARSE_LOCATION
+	)
 	
-	if (locationPermissionState.status.isGranted) {
-	
+	val location: MutableState<Location?> = remember {
+		mutableStateOf(null)
 	}
-	Button(onClick = {  }) {
+	
+	if (locationPermissionsState.status.isGranted) {
+		location.value = getLocation()
+	} else {
+		val textToShow = if (locationPermissionsState.status.shouldShowRationale) {
+			"pls give"
+		} else "ok"
+		Column {
+			Text(text = textToShow)
+			Spacer(modifier = Modifier.height(8.dp))
+			Button(onClick = { locationPermissionsState.launchPermissionRequest() }) {
+				Text(text = "Request Permission")
+			}
+		}
+	}
+	Button(
+		onClick = {
+			location.value?.let {
+				onClick(it.latitude, it.longitude)
+			}
+		},
+		enabled = location.value!=null
+		) {
 		Row() {
 			Text(text = "Current")
 			//todo

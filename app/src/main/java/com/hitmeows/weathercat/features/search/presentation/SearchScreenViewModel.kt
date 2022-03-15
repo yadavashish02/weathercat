@@ -49,4 +49,8 @@ class SearchScreenViewModel(
 			}
 		}
 	}
+	
+	fun getWeather(lat: Double, lon: Double) {
+		//todo
+	}
 }
