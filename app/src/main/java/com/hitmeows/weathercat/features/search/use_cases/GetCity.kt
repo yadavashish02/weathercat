@@ -21,7 +21,9 @@ class GetCity(
 	
 	private fun queryBuilder(cityName: String,countryCode: String): String {
 		//todo
-		return ""
+		var q = cityName
+		if (countryCode!="All") q+=",$countryCode"
+		return q
 	}
 	
 	

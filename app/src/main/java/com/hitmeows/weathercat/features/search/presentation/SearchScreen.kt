@@ -9,10 +9,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
@@ -103,7 +100,7 @@ fun CityItem(
 	text: String,
 	onClick: () -> Unit
 ) {
-	Button(onClick = { onClick() }) {
+	TextButton(onClick = { onClick() }) {
 		Text(text = text)
 	}
 }
@@ -122,28 +119,16 @@ fun CurrentCity(
 		mutableStateOf(null)
 	}
 	
-	if (locationPermissionsState.status.isGranted) {
-		location.value = getLocation()
-	} else {
-		val textToShow = if (locationPermissionsState.status.shouldShowRationale) {
-			"pls give"
-		} else "ok"
-		Column {
-			Text(text = textToShow)
-			Spacer(modifier = Modifier.height(8.dp))
-			Button(onClick = { locationPermissionsState.launchPermissionRequest() }) {
-				Text(text = "Request Permission")
-			}
-		}
-	}
-	Button(
+	TextButton(
 		onClick = {
+			if (!locationPermissionsState.status.isGranted) {
+				locationPermissionsState.launchPermissionRequest()
+			}
+			location.value = getLocation()
 			location.value?.let {
 				onClick(it.latitude, it.longitude)
 			}
-		},
-		enabled = location.value!=null
-		) {
+		}) {
 		Row() {
 			Text(text = "Current")
 			//todo

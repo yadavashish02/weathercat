@@ -1,5 +1,6 @@
 package com.hitmeows.weathercat.features.search.data.remote
 
+import android.util.Log
 import com.hitmeows.weathercat.features.country.CountryNameFromIsoCode
 import com.hitmeows.weathercat.features.country.data.local.CountryDao
 import com.hitmeows.weathercat.features.country.data.local.CountryDatabase
@@ -19,10 +20,11 @@ data class SearchedCityDto(
 	val lon: Double
 ){
 	suspend fun toSearchedCity(dao: CountryDao): SearchedCity {
+		val name = CountryNameFromIsoCode(dao).invoke(countryCode)
 		return SearchedCity(
 			cityName,
 			stateName?:"",
-			CountryNameFromIsoCode(dao).invoke(countryCode),
+			name,
 			lat,
 			lon
 		)

@@ -1,20 +1,22 @@
 package com.hitmeows.weathercat.features.search.presentation
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.hitmeows.weathercat.common.Resource
-import com.hitmeows.weathercat.features.search.domain.SearchCityRepository
 import com.hitmeows.weathercat.features.search.use_cases.GetCity
+import com.hitmeows.weathercat.features.search.use_cases.SearchUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel
-class SearchScreenViewModel(
-	private val getCity: GetCity
+class SearchScreenViewModel @Inject constructor(
+	private val useCases: SearchUseCases
 ): ViewModel() {
 	private val _citiesState = mutableStateOf(SearchedCitiesState())
 	val citiesState: State<SearchedCitiesState> = _citiesState
@@ -23,7 +25,7 @@ class SearchScreenViewModel(
 	fun searchCity(cityName: String) {
 		searchJob?.cancel()
 		searchJob = viewModelScope.launch{
-			getCity(cityName).collectLatest {
+			useCases.getCity(cityName).collectLatest {
 				when(it) {
 					is Resource.Loading -> {
 						_citiesState.value = SearchedCitiesState(isLoading = true)
@@ -52,5 +54,6 @@ class SearchScreenViewModel(
 	
 	fun getWeather(lat: Double, lon: Double) {
 		//todo
+		Log.d("currentlocation", "$lat, $lon")
 	}
 }
