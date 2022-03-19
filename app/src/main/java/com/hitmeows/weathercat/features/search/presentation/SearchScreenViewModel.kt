@@ -5,6 +5,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.location.FusedLocationProviderClient
 import com.hitmeows.weathercat.common.Resource
 import com.hitmeows.weathercat.features.search.use_cases.GetCity
 import com.hitmeows.weathercat.features.search.use_cases.SearchUseCases
@@ -16,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SearchScreenViewModel @Inject constructor(
-	private val useCases: SearchUseCases
+	private val useCases: SearchUseCases,
+	private val fusedLocationProviderClient: FusedLocationProviderClient
 ): ViewModel() {
 	private val _citiesState = mutableStateOf(SearchedCitiesState())
 	val citiesState: State<SearchedCitiesState> = _citiesState
@@ -50,6 +52,10 @@ class SearchScreenViewModel @Inject constructor(
 				}
 			}
 		}
+	}
+	
+	fun getCurrentLocation() {
+	
 	}
 	
 	fun getWeather(lat: Double, lon: Double) {

@@ -2,6 +2,8 @@ package com.hitmeows.weathercat.di
 
 import android.app.Application
 import androidx.room.Room
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.hitmeows.weathercat.features.country.CountryNameFromIsoCode
 import com.hitmeows.weathercat.features.country.data.local.CountryDatabase
 import com.hitmeows.weathercat.features.search.data.SearchCityRepositoryImpl
