@@ -18,6 +18,8 @@ class WeatherApiImpl(
 		const val PARAM_API_KEY = "appid"
 		const val PARAM_UNITS = "units"
 		const val UNIT_METRIC = "metric"
+		const val PARAM_EXCLUDE = "exclude"
+		const val EXCLUDE_CURRENT_AND_MINUTELY = "current,minutely"
 	}
 	
 	override suspend fun getCurrentWeather(lat: Double, lon: Double): CurrentWeatherDto {
@@ -40,6 +42,7 @@ class WeatherApiImpl(
 				parameter(PARAM_LON,lon)
 				parameter(PARAM_UNITS, UNIT_METRIC)
 				parameter(PARAM_API_KEY,Keys.API_KEY_WEATHERMAP)
+				parameter(PARAM_EXCLUDE, EXCLUDE_CURRENT_AND_MINUTELY)
 			}
 		}
 	}
