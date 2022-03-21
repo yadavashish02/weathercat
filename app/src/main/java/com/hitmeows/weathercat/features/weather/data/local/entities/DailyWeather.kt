@@ -6,13 +6,13 @@ import com.hitmeows.weathercat.features.weather.data.local.Coordinates
 
 @Entity
 data class DailyWeather(
-	@PrimaryKey(autoGenerate = true)
-	val id: Int,
 	val coordinates: Coordinates,
 	val minTemp: Int,
 	val maxTemp: Int,
 	val weatherIcon: String,
 	val weatherDescription: String,
 	val dt: Long,
-	val timezone: Long
+	val timezone: Long,
+	@PrimaryKey(autoGenerate = true)
+	val id: Int = 0
 )

@@ -3,23 +3,22 @@ package com.hitmeows.weathercat.features.search.presentation
 import android.location.Location
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.*
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.Text
+import androidx.compose.material.TextButton
+import androidx.compose.material.TextField
 import androidx.compose.runtime.*
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
-import com.google.accompanist.permissions.shouldShowRationale
+import com.hitmeows.weathercat.features.search.domain.SearchedCity
 
 @Composable
 fun SearchScreen(
@@ -33,8 +32,11 @@ fun SearchScreen(
 			viewModel.searchCity(it)
 		})
 		CitiesColumn(citiesState = state,
-			onItemClick = {lat,lon->
-				viewModel.getWeather(lat, lon)
+			onCurrentItemClick = { lat, lon ->
+				viewModel.insertWeather(lat, lon)
+			},
+			onItemClick = {
+				viewModel.insertWeather(it)
 			}
 		) {
 			getLocation()
@@ -68,15 +70,16 @@ fun SearchBar(
 @Composable
 fun CitiesColumn(
 	citiesState: SearchedCitiesState,
-	onItemClick: (Double, Double) -> Unit,
+	onCurrentItemClick: (Double, Double) -> Unit,
+	onItemClick: (SearchedCity) -> Unit,
 	getLocation: () -> Location?
 ) {
 	if (citiesState.isLoading) CircularProgressIndicator()
 	if (citiesState.isError) Text(text = citiesState.errorMessage)
 	LazyColumn() {
 		item {
-			CurrentCity(onClick = {lat,lon ->
-				onItemClick(lat,lon)
+			CurrentCity(onClick = { lat, lon ->
+				onCurrentItemClick(lat, lon)
 			}) {
 				getLocation()
 			}
@@ -89,7 +92,7 @@ fun CitiesColumn(
 						else "" +
 								", ${it.countryName}"
 			) {
-				onItemClick(it.lat, it.lon)
+				onItemClick(it)
 			}
 		}
 	}
@@ -111,6 +114,10 @@ fun CurrentCity(
 	onClick: (Double, Double) -> Unit,
 	getLocation: () -> Location?
 ) {
+	
+	var isButtonEnabled by remember {
+		mutableStateOf(true)
+	}
 	val locationPermissionsState = rememberPermissionState(
 		permission = android.Manifest.permission.ACCESS_COARSE_LOCATION
 	)
@@ -119,12 +126,21 @@ fun CurrentCity(
 		mutableStateOf(null)
 	}
 	
+	LaunchedEffect(key1 = location.value) {
+		if (locationPermissionsState.status.isGranted) {
+			if (location.value != null) isButtonEnabled = false
+			location.value?.let { onClick(it.latitude, it.longitude) }
+		}
+	}
+	
 	TextButton(
+		enabled = isButtonEnabled,
 		onClick = {
 			if (!locationPermissionsState.status.isGranted) {
 				locationPermissionsState.launchPermissionRequest()
 			}
 			location.value = getLocation()
+			if (location.value != null) isButtonEnabled = false
 			location.value?.let {
 				onClick(it.latitude, it.longitude)
 			}

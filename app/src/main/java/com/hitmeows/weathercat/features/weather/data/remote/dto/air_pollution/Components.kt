@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Components(
     val co: Double,
-    val no: Int,
+    val no: Double,
     val no2: Double,
     val o3: Double,
     val so2: Double,

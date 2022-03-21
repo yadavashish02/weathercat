@@ -11,7 +11,7 @@ data class UserCity(
 	val name: String,
 	val state: String,
 	val country: String,
-	val index: Int
+	val isCurrent: Boolean
 )
 
 
