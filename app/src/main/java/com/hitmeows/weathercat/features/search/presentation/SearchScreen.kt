@@ -151,7 +151,7 @@ fun CityItem(
 }
 
 @OptIn(
-	ExperimentalPermissionsApi::class
+	ExperimentalPermissionsApi::class, androidx.compose.ui.unit.ExperimentalUnitApi::class
 )
 @Composable
 fun CurrentCity(
