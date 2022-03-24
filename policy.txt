@@ -1,0 +1,1 @@
+App requires approximate location to gather nearby weather data, remember it does not collect your precise location.
