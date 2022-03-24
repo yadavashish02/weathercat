@@ -48,7 +48,7 @@ class CityListViewModel @Inject constructor(
 	
 	private fun getCityList() {
 		job?.cancel()
-		job = viewModelScope.launch() {
+		job = viewModelScope.launch {
 			getUserCitiesWithWeather.invoke().collectLatest {
 				when (it) {
 					is Resource.Loading -> {

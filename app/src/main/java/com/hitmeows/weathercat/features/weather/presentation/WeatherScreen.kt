@@ -65,9 +65,9 @@ fun WeatherScreen(
 	
 	val isRefreshing = viewModel.isRefreshing.collectAsState()
 	val scrollState = rememberScrollState()
-	val haze = Color(82,72,50)
-	val rain = Color(36,60,76)
-	val clear = Color(122,160,204)
+	val haze = Color(82, 72, 50)
+	val rain = Color(36, 60, 76)
+	val clear = Color(122, 160, 204)
 	val clouds = Color.DarkGray
 	val snow = Color.White.copy(0.5f)
 	
@@ -93,11 +93,11 @@ fun WeatherScreen(
 		if (listState.value.isNotEmpty()) {
 			val id = weatherState.value.weather.weatherId.toString()
 			color = if (id.startsWith("2") || id.startsWith("3") || id.startsWith("5")) rain
-					else if (id.startsWith("7")) haze
-					else if (id.startsWith("800")) clear
-					else if (id.startsWith("8")) clouds
-					else if (id.startsWith("6")) snow
-					else Color.Transparent
+			else if (id.startsWith("7")) haze
+			else if (id.startsWith("800")) clear
+			else if (id.startsWith("8")) clouds
+			else if (id.startsWith("6")) snow
+			else Color.Transparent
 			Box(
 				modifier = Modifier
 					.fillMaxWidth()
@@ -112,37 +112,37 @@ fun WeatherScreen(
 					)
 			)
 			Column {
-					LazyRow(Modifier.fillMaxWidth()) {
-						items(listState.value) {
-							Button(
-								onClick = {
-									isLaunched.value = false
-									selectedCoordinates.value = it.coordinates
-									viewModel.getCurrentWeather(
-										it.coordinates.lat,
-										it.coordinates.lon
-									)
-									viewModel.getHourly(
-										it.coordinates.lat,
-										it.coordinates.lon
-									)
-									viewModel.getDaily(
-										it.coordinates.lat,
-										it.coordinates.lon
-									)
-								},
-								modifier = Modifier.padding(5.dp, 10.dp),
-								colors = ButtonDefaults.buttonColors(
-									contentColor = Color.White,
-									backgroundColor = if (it.coordinates == selectedCoordinates.value || isLaunched.value && it.coordinates == listState.value[0].coordinates) {
-										MaterialTheme.colors.primary
-									} else color
+				LazyRow(Modifier.fillMaxWidth()) {
+					items(listState.value) {
+						Button(
+							onClick = {
+								isLaunched.value = false
+								selectedCoordinates.value = it.coordinates
+								viewModel.getCurrentWeather(
+									it.coordinates.lat,
+									it.coordinates.lon
 								)
-							) {
-								Text(text = it.name)
-							}
+								viewModel.getHourly(
+									it.coordinates.lat,
+									it.coordinates.lon
+								)
+								viewModel.getDaily(
+									it.coordinates.lat,
+									it.coordinates.lon
+								)
+							},
+							modifier = Modifier.padding(5.dp, 10.dp),
+							colors = ButtonDefaults.buttonColors(
+								contentColor = Color.White,
+								backgroundColor = if (it.coordinates == selectedCoordinates.value || isLaunched.value && it.coordinates == listState.value[0].coordinates) {
+									MaterialTheme.colors.primary
+								} else color
+							)
+						) {
+							Text(text = it.name)
 						}
 					}
+				}
 				
 				Divider(color = color.copy(0.8f))
 				
@@ -204,7 +204,7 @@ fun TemperaturePanel(
 	val month = now.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
 	val date = now.dayOfMonth.toString()
 	val day = now.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-	Column() {
+	Column {
 		Row(
 			Modifier
 				.padding(20.dp, 10.dp, 10.dp, 5.dp)

@@ -110,7 +110,7 @@ fun CitiesColumn(
 ) {
 	if (citiesState.isLoading) CircularProgressIndicator()
 	if (citiesState.isError) Text(text = citiesState.errorMessage)
-	LazyColumn() {
+	LazyColumn {
 		item {
 			CurrentCity(onClick = { lat, lon ->
 				onCurrentItemClick(lat, lon)
@@ -184,7 +184,7 @@ fun CurrentCity(
 					onClick(it.latitude, it.longitude)
 				}
 			}) {
-			Row() {
+			Row {
 				Text(text = "Current", fontSize = TextUnit(19f, TextUnitType.Sp))
 				Spacer(modifier = Modifier.width(5.dp))
 				Icon(imageVector = Icons.Default.LocationOn, contentDescription = "")
