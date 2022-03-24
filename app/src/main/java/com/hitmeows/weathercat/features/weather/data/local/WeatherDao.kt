@@ -3,6 +3,7 @@ package com.hitmeows.weathercat.features.weather.data.local
 import androidx.room.*
 import com.hitmeows.weathercat.features.weather.data.local.entities.*
 import kotlinx.coroutines.flow.Flow
+
 @Dao
 interface WeatherDao {
 	@Transaction
@@ -22,7 +23,7 @@ interface WeatherDao {
 	suspend fun insertDailyWeather(dailyWeather: DailyWeather)
 	
 	@Query("select * from airpollution where coordinates = :coordinates")
-	fun getAirPollution(coordinates: Coordinates): Flow<AirPollution>
+	fun getAirPollution(coordinates: Coordinates): AirPollution
 	
 	@Query("select * from currentweather where coordinates = :coordinates")
 	suspend fun getCurrentWeather(coordinates: Coordinates): CurrentWeather
@@ -33,7 +34,13 @@ interface WeatherDao {
 	@Query("select * from dailyweather where coordinates = :coordinates order by dt asc")
 	fun getDailyWeather(coordinates: Coordinates): Flow<List<DailyWeather>>
 	
-	@Query("select * from usercity")
+	@Query("select * from dailyweather where coordinates = :coordinates")
+	suspend fun getDailyWithoutFlow(coordinates: Coordinates): List<DailyWeather>
+	
+	@Query("select * from hourlyweather where coordinates = :coordinates")
+	suspend fun getHourlyWithoutFlow(coordinates: Coordinates): List<HourlyWeather>
+	
+	@Query("select * from usercity order by isCurrent desc")
 	fun getAllUserCities(): Flow<List<UserCity>>
 	
 	@Query("select count(*) from usercity where coordinates = :coordinates")
@@ -44,6 +51,12 @@ interface WeatherDao {
 	
 	@Query("select count(*) from usercity where isCurrent = 1")
 	suspend fun countCurrentCity(): Int
+	
+	@Query("select * from usercity")
+	suspend fun getAllUserCityWithoutFlow(): List<UserCity>
+	
+	@Query("select * from usercity where coordinates = :coordinates")
+	suspend fun getUserCity(coordinates: Coordinates): UserCity
 	
 	@Delete
 	suspend fun deleteUserCity(userCity: UserCity)
@@ -59,5 +72,6 @@ interface WeatherDao {
 	
 	@Delete
 	suspend fun deleteDailyWeather(dailyWeather: List<DailyWeather>)
+	
 	
 }

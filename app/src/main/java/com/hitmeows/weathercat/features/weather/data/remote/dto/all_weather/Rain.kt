@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Rain(
-    @SerialName("1h")
-    val h: Double
+	@SerialName("1h")
+	val h: Double
 )

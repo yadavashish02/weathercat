@@ -18,7 +18,7 @@ class Insert(
 		repository.insertUserCityWithWeather(
 			UserCity(
 				Coordinates(lat, lon),
-				name, state, country,isCurrent
+				name, state, country, isCurrent
 			)
 		)
 	}

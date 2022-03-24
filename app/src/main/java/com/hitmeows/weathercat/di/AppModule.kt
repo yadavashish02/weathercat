@@ -2,6 +2,9 @@ package com.hitmeows.weathercat.di
 
 import android.app.Application
 import androidx.room.Room
+import androidx.work.WorkManager
+import com.hitmeows.weathercat.common.DeleteUserCities
+import com.hitmeows.weathercat.common.UpdateWeather
 import com.hitmeows.weathercat.features.city_list.use_cases.GetUserCitiesWithWeather
 import com.hitmeows.weathercat.features.country.CountryNameFromIsoCode
 import com.hitmeows.weathercat.features.country.data.local.CountryDatabase
@@ -18,10 +21,7 @@ import com.hitmeows.weathercat.features.weather.data.local.WeatherDatabase
 import com.hitmeows.weathercat.features.weather.data.remote.WeatherApi
 import com.hitmeows.weathercat.features.weather.data.remote.WeatherApiImpl
 import com.hitmeows.weathercat.features.weather.domain.WeatherRepository
-import com.hitmeows.weathercat.features.weather.use_cases.GetAllUserCities
-import com.hitmeows.weathercat.features.weather.use_cases.GetCurrent
-import com.hitmeows.weathercat.features.weather.use_cases.Insert
-import com.hitmeows.weathercat.features.weather.use_cases.WeatherUseCases
+import com.hitmeows.weathercat.features.weather.use_cases.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -121,7 +121,11 @@ object AppModule {
 		return WeatherUseCases(
 			GetCurrent(repo),
 			GetAllUserCities(repo),
-			Insert(repo)
+			Insert(repo),
+			GetPollution(repo),
+			GetHourly(repo),
+			GetDaily(repo),
+			DeleteUserCity(repo)
 		)
 	}
 	
@@ -134,4 +138,21 @@ object AppModule {
 		)
 	}
 	
+	@Provides
+	@Singleton
+	fun provideUpdateWeather(repo: WeatherRepository): UpdateWeather {
+		return UpdateWeather(repo)
+	}
+	
+	@Provides
+	@Singleton
+	fun provideWorkManager(application: Application): WorkManager {
+		return WorkManager.getInstance(application)
+	}
+	
+	@Provides
+	@Singleton
+	fun provideDeleteUserCities(repo: WeatherRepository): DeleteUserCities {
+		return DeleteUserCities(repo)
+	}
 }

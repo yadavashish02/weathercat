@@ -1,16 +1,14 @@
 package com.hitmeows.weathercat.features.search.use_cases
 
-import com.hitmeows.weathercat.common.ApiException
 import com.hitmeows.weathercat.common.Resource
 import com.hitmeows.weathercat.features.search.domain.SearchCityRepository
-import com.hitmeows.weathercat.features.search.domain.SearchedCity
 import kotlinx.coroutines.flow.flow
 
 class GetCity(
 	private val repository: SearchCityRepository
 ) {
 	suspend operator fun invoke(cityName: String, countryCode: String = "All") = flow {
-		val query = queryBuilder(cityName,countryCode)
+		val query = queryBuilder(cityName, countryCode)
 		emit(Resource.Loading())
 		try {
 			emit(Resource.Success(repository.getCity(query)))
@@ -19,10 +17,10 @@ class GetCity(
 		}
 	}
 	
-	private fun queryBuilder(cityName: String,countryCode: String): String {
+	private fun queryBuilder(cityName: String, countryCode: String): String {
 		//todo
 		var q = cityName
-		if (countryCode!="All") q+=",$countryCode"
+		if (countryCode != "All") q += ",$countryCode"
 		return q
 	}
 	

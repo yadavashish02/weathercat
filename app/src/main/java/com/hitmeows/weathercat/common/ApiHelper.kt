@@ -19,9 +19,9 @@ suspend inline fun <T> apiHelper(
 		} catch (e: ServerResponseException) {
 			throw ApiException(e.response.status.description)
 		} catch (e: Exception) {
-			throw ApiException(e.localizedMessage?:"unknown error occurred")
+			throw ApiException(e.localizedMessage ?: "unknown error occurred")
 		}
 	}
 }
 
-class ApiException(message: String): Exception(message)
+class ApiException(message: String) : Exception(message)

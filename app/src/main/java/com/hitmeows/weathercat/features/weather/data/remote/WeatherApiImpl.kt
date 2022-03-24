@@ -11,7 +11,7 @@ import io.ktor.client.request.*
 
 class WeatherApiImpl(
 	private val client: HttpClient
-): WeatherApi {
+) : WeatherApi {
 	companion object {
 		const val PARAM_LAT = "lat"
 		const val PARAM_LON = "lon"
@@ -26,10 +26,10 @@ class WeatherApiImpl(
 		return apiHelper {
 			client.get {
 				url(HttpRoutes.CURRENT_WEATHER)
-				parameter(PARAM_LAT,lat)
-				parameter(PARAM_LON,lon)
+				parameter(PARAM_LAT, lat)
+				parameter(PARAM_LON, lon)
 				parameter(PARAM_UNITS, UNIT_METRIC)
-				parameter(PARAM_API_KEY,Keys.API_KEY_WEATHERMAP)
+				parameter(PARAM_API_KEY, Keys.API_KEY_WEATHERMAP)
 			}
 		}
 	}
@@ -38,10 +38,10 @@ class WeatherApiImpl(
 		return apiHelper {
 			client.get {
 				url(HttpRoutes.ALL_WEATHER)
-				parameter(PARAM_LAT,lat)
-				parameter(PARAM_LON,lon)
+				parameter(PARAM_LAT, lat)
+				parameter(PARAM_LON, lon)
 				parameter(PARAM_UNITS, UNIT_METRIC)
-				parameter(PARAM_API_KEY,Keys.API_KEY_WEATHERMAP)
+				parameter(PARAM_API_KEY, Keys.API_KEY_WEATHERMAP)
 				parameter(PARAM_EXCLUDE, EXCLUDE_CURRENT_AND_MINUTELY)
 			}
 		}
@@ -51,10 +51,10 @@ class WeatherApiImpl(
 		return apiHelper {
 			client.get {
 				url(HttpRoutes.AIR_POLLUTION)
-				parameter(PARAM_LAT,lat)
-				parameter(PARAM_LON,lon)
+				parameter(PARAM_LAT, lat)
+				parameter(PARAM_LON, lon)
 				parameter(PARAM_UNITS, UNIT_METRIC)
-				parameter(PARAM_API_KEY,Keys.API_KEY_WEATHERMAP)
+				parameter(PARAM_API_KEY, Keys.API_KEY_WEATHERMAP)
 			}
 		}
 	}

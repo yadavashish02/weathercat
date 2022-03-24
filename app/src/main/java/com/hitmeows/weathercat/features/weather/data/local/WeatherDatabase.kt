@@ -16,8 +16,9 @@ import com.hitmeows.weathercat.features.weather.data.local.entities.*
 	version = 1
 )
 @TypeConverters(CoordinateConverter::class)
-abstract class WeatherDatabase: RoomDatabase() {
+abstract class WeatherDatabase : RoomDatabase() {
 	abstract val dao: WeatherDao
+	
 	companion object {
 		const val DB_NAME = "weather_db"
 	}

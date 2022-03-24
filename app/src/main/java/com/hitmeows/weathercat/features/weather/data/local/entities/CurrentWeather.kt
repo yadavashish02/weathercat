@@ -19,5 +19,6 @@ data class CurrentWeather(
 	val windSpeed: Double,
 	val windDirection: Double,
 	val dt: Long,
-	val timezone: Long
+	val timezone: Long,
+	val icon: String
 )

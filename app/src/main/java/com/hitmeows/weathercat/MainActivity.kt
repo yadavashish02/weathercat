@@ -4,24 +4,27 @@ import android.Manifest
 import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.app.ActivityCompat
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.hitmeows.weathercat.features.city_list.presentation.CityListScreen
 import com.hitmeows.weathercat.features.search.presentation.SearchScreen
+import com.hitmeows.weathercat.features.weather.presentation.WeatherScreen
 import com.hitmeows.weathercat.ui.theme.WeatherCatTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -36,26 +39,29 @@ class MainActivity : ComponentActivity() {
 		fusedLocationsClient = LocationServices.getFusedLocationProviderClient(this)
 		
 		setContent {
+			val navController = rememberNavController()
+			val ui = rememberSystemUiController()
+			
 			WeatherCatTheme {
 				Surface(
 					modifier = Modifier.fillMaxSize(),
 					color = MaterialTheme.colors.background
 				) {
-					Column(
-						verticalArrangement = Arrangement.SpaceEvenly
-					) {
-						Box(modifier = Modifier.weight(1f)) {
-							CityListScreen()
+					ui.setStatusBarColor(MaterialTheme.colors.background)
+					NavHost(navController = navController, startDestination = "weather") {
+						composable("weather") {
+							WeatherScreen(navController)
 						}
-						Box(modifier = Modifier.weight(1f)) {
+						composable("city_list") {
+							CityListScreen(navController)
+						}
+						composable("search") {
 							SearchScreen(getLocation = {
 								getLocation()
 								location.value
-							})
+							}, navController = navController)
 						}
-						
 					}
-					
 				}
 			}
 		}

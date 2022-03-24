@@ -7,5 +7,5 @@ import com.hitmeows.weathercat.features.weather.data.remote.dto.current_weather.
 interface WeatherApi {
 	suspend fun getCurrentWeather(lat: Double, lon: Double): CurrentWeatherDto
 	suspend fun getAllWeather(lat: Double, lon: Double): AllWeatherDto
-	suspend fun getPollution(lat: Double,lon: Double): AirPollutionDto
+	suspend fun getPollution(lat: Double, lon: Double): AirPollutionDto
 }

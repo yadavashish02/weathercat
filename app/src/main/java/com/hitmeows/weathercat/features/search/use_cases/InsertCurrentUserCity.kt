@@ -8,7 +8,7 @@ class InsertCurrentUserCity(
 	private val repository: SearchCityRepository,
 	private val insert: Insert
 ) {
-	suspend operator fun invoke(lat: Double,lon: Double) {
+	suspend operator fun invoke(lat: Double, lon: Double) {
 		val city = repository.getCityByCoord(lat, lon)
 		delay(2000)
 		insert.invoke(

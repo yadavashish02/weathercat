@@ -8,7 +8,7 @@ import io.ktor.client.request.*
 
 class SearchApiImpl(
 	private val client: HttpClient
-): SearchApi {
+) : SearchApi {
 	companion object {
 		const val PARAM_QUERY = "q"
 		const val PARAM_LIMIT = "limit"
@@ -22,7 +22,7 @@ class SearchApiImpl(
 		return apiHelper {
 			client.get {
 				url(HttpRoutes.SEARCH_CITY)
-				parameter(PARAM_QUERY,query)
+				parameter(PARAM_QUERY, query)
 				parameter(PARAM_LIMIT, LIMIT)
 				parameter(PARAM_API_KEY, Keys.API_KEY_WEATHERMAP)
 			}
@@ -33,9 +33,9 @@ class SearchApiImpl(
 		return apiHelper {
 			client.get {
 				url(HttpRoutes.REVERSE_SEARCH)
-				parameter(PARAM_LAT,lat)
-				parameter(PARAM_LON,lon)
-				parameter(PARAM_API_KEY,Keys.API_KEY_WEATHERMAP)
+				parameter(PARAM_LAT, lat)
+				parameter(PARAM_LON, lon)
+				parameter(PARAM_API_KEY, Keys.API_KEY_WEATHERMAP)
 			}
 		}
 	}

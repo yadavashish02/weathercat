@@ -1,5 +1,6 @@
 package com.hitmeows.weathercat.features.weather.data
 
+import android.util.Log
 import androidx.room.withTransaction
 import com.hitmeows.weathercat.features.weather.data.local.Coordinates
 import com.hitmeows.weathercat.features.weather.data.local.WeatherDatabase
@@ -10,7 +11,6 @@ import com.hitmeows.weathercat.features.weather.data.remote.dto.all_weather.AllW
 import com.hitmeows.weathercat.features.weather.data.remote.dto.current_weather.CurrentWeatherDto
 import com.hitmeows.weathercat.features.weather.domain.WeatherRepository
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collectLatest
 import kotlin.math.roundToInt
 
 class WeatherRepositoryImpl(
@@ -19,19 +19,19 @@ class WeatherRepositoryImpl(
 ) : WeatherRepository {
 	private val dao = db.dao
 	
-	override suspend fun insertUserCityWithWeather(userCity: UserCity) {
-		if (dao.countUserCity(userCity.coordinates) > 0) return
-		if (userCity.isCurrent && dao.countCurrentCity()>0) {
+	override suspend fun insertUserCityWithWeather(userCity: UserCity, isUpdate: Boolean) {
+		if (dao.countUserCity(userCity.coordinates) > 0 && !isUpdate) return
+		if (userCity.isCurrent && dao.countCurrentCity() > 0 && !isUpdate) {
 			dao.deleteUserCity(dao.getCurrentCity())
 		}
 		db.withTransaction {
 			dao.insertUserCity(userCity)
-			dao.insertAirPollution(
-				api.getPollution(
-					userCity.coordinates.lat,
-					userCity.coordinates.lon
-				).toAirPollution(userCity.coordinates)
-			)
+//			dao.insertAirPollution(
+//				api.getPollution(
+//					userCity.coordinates.lat,
+//					userCity.coordinates.lon
+//				).toAirPollution(userCity.coordinates)
+//			)
 			
 			dao.insertCurrentWeather(
 				api.getCurrentWeather(
@@ -54,7 +54,7 @@ class WeatherRepositoryImpl(
 		}
 	}
 	
-	override suspend fun getAirPollution(coordinates: Coordinates): Flow<AirPollution> {
+	override suspend fun getAirPollution(coordinates: Coordinates): AirPollution {
 		return dao.getAirPollution(coordinates)
 	}
 	
@@ -70,19 +70,13 @@ class WeatherRepositoryImpl(
 		return dao.getDailyWeather(coordinates)
 	}
 	
-	override suspend fun deleteUserCity(userCity: UserCity) {
+	override suspend fun deleteUserCity(coordinates: Coordinates) {
 		db.withTransaction {
-			dao.getAirPollution(userCity.coordinates).collectLatest {
-				dao.deleteAirPollution(it)
-			}
-			dao.deleteCurrentWeather(dao.getCurrentWeather(userCity.coordinates))
-			dao.getHourlyWeather(userCity.coordinates).collectLatest {
-				dao.deleteHourlyWeather(it)
-			}
-			dao.getDailyWeather(userCity.coordinates).collectLatest {
-				dao.deleteDailyWeather(it)
-			}
-			dao.deleteUserCity(userCity)
+			//dao.deleteAirPollution(dao.getAirPollution(coordinates))
+			dao.deleteCurrentWeather(dao.getCurrentWeather(coordinates))
+			dao.deleteHourlyWeather(dao.getHourlyWithoutFlow(coordinates))
+			dao.deleteDailyWeather(dao.getDailyWithoutFlow(coordinates))
+			dao.deleteUserCity(dao.getUserCity(coordinates))
 		}
 	}
 	
@@ -148,7 +142,24 @@ class WeatherRepositoryImpl(
 			wind.speed,
 			wind.deg,
 			dt,
-			timezone
+			timezone,
+			weather[0].icon
 		)
+	}
+	
+	override suspend fun update() {
+		dao.getAllUserCityWithoutFlow().forEach { userCity ->
+			insertUserCityWithWeather(userCity, true)
+		}
+	}
+	
+	override suspend fun update(lat: Double, lon: Double) {
+		val coordinates = Coordinates(lat, lon)
+		val userCity = dao.getUserCity(coordinates)
+		Log.d("updateee", "$lat,$lon")
+		db.withTransaction {
+			deleteUserCity(coordinates)
+			insertUserCityWithWeather(userCity)
+		}
 	}
 }

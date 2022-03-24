@@ -11,6 +11,9 @@ import com.hitmeows.weathercat.features.search.use_cases.SearchUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -23,6 +26,9 @@ class SearchScreenViewModel @Inject constructor(
 	val citiesState: State<SearchedCitiesState> = _citiesState
 	private val _errorState = mutableStateOf("")
 	val errorState: State<String> = _errorState
+	private val _isLoading = MutableStateFlow(false)
+	val isLoading: StateFlow<Boolean>
+		get() = _isLoading.asStateFlow()
 	
 	private var searchJob: Job? = null
 	private var insertJob: Job? = null
@@ -60,10 +66,17 @@ class SearchScreenViewModel @Inject constructor(
 	
 	
 	fun insertWeather(lat: Double, lon: Double) {
-		Log.d("okhttp","$lat,$lon")
-		if (insertJob?.isCompleted == true || insertJob == null) {
+		Log.d("okhttp", "$lat,$lon")
+		if (insertCurrentJob?.isCompleted == true || insertCurrentJob == null) {
 			insertCurrentJob = viewModelScope.launch(Dispatchers.IO) {
-				useCases.insertCurrentUserCity.invoke(lat, lon)
+				_isLoading.emit(true)
+				Log.d("okhttp", "iini")
+				try {
+					useCases.insertCurrentUserCity.invoke(lat, lon)
+				} catch (e: Exception) {
+					Log.d("error", e.message ?: "err")
+				}
+				_isLoading.emit(false)
 			}
 		}
 	}
@@ -71,10 +84,12 @@ class SearchScreenViewModel @Inject constructor(
 	fun insertWeather(searchedCity: SearchedCity) {
 		if (insertJob?.isCompleted == true || insertJob == null) {
 			insertJob = viewModelScope.launch(Dispatchers.IO) {
+				_isLoading.emit(true)
 				when (val v = useCases.insertUserCity.invoke(searchedCity)) {
-					is Resource.Error -> _errorState.value = v.exception?.localizedMessage?:""
+					is Resource.Error -> _errorState.value = v.exception?.localizedMessage ?: ""
 					else -> _errorState.value = ""
 				}
+				_isLoading.emit(false)
 			}
 		}
 		

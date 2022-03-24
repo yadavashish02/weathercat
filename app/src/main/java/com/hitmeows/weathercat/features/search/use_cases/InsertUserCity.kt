@@ -18,7 +18,7 @@ class InsertUserCity(
 			)
 			Resource.Success(true)
 		} catch (e: Exception) {
-			Resource.Error(e,false)
+			Resource.Error(e, false)
 		}
 		
 	}

@@ -11,8 +11,8 @@ class GetUserCitiesWithWeather(
 	private val getCurrent: GetCurrent
 ) {
 	suspend operator fun invoke() = channelFlow {
-		val list = mutableListOf<UserCityWithWeather>()
 		send(Resource.Loading())
+		val list = mutableListOf<UserCityWithWeather>()
 		try {
 			getAllUserCities.invoke().collect { list1 ->
 				list.clear()
@@ -25,7 +25,8 @@ class GetUserCitiesWithWeather(
 						userCity.name,
 						current.weatherId,
 						current.weatherDescription,
-						current.currentTemp
+						current.currentTemp,
+						current.coordinates
 					)
 					if (userCity.isCurrent) list.add(0, city1)
 					else list.add(city1)
